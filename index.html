@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Passa Market — Painel de anúncios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F2E9;--surface:#fff;--surface-2:#FBF8F1;--ink:#173F3B;--ink-soft:#46615C;
+    --line:#E7DFCE;--line-strong:#D8CDB4;--marigold:#DD942F;--marigold-soft:#F7E6C6;
+    --trade:#2F8F6B;--trade-soft:#DBEFE4;--doa:#7A5AA6;--doa-soft:#EAE2F4;--danger:#BE4527;--danger-soft:#F6E0D8;
+    --text:#1A2421;--shadow:0 1px 2px rgba(23,63,59,.06),0 8px 24px rgba(23,63,59,.07);
+    --shadow-lg:0 12px 40px rgba(23,63,59,.18);--r:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--text);font-family:"DM Sans",system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:"Fraunces",Georgia,serif;font-weight:600;margin:0;color:var(--ink);line-height:1.1}
+  button{font-family:inherit;cursor:pointer}
+  a{color:var(--marigold)}
+  :focus-visible{outline:3px solid var(--marigold);outline-offset:2px;border-radius:6px}
+
+  .topbar{position:sticky;top:0;z-index:30;background:rgba(246,242,233,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .topbar-inner{max-width:1080px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px}
+  .brand{display:flex;align-items:center;gap:11px;margin-right:auto}
+  .mark{width:38px;height:38px;border-radius:11px;background:var(--ink);display:grid;place-items:center;flex:none}
+  .mark svg{width:22px;height:22px}
+  .brand-name{font-family:"Fraunces",serif;font-weight:600;font-size:20px;color:var(--ink)}
+  .brand-name b{color:var(--marigold)}
+  .brand-sub{font-size:11px;color:var(--ink-soft);font-weight:600;letter-spacing:.4px;text-transform:uppercase}
+  .who{font-size:13px;color:var(--ink-soft);font-weight:500}
+  .btn{border:1px solid transparent;border-radius:11px;padding:11px 18px;font-size:14.5px;font-weight:600;
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap;transition:transform .08s,background .15s}
+  .btn:active{transform:translateY(1px)}
+  .btn svg{width:17px;height:17px}
+  .btn-primary{background:var(--ink);color:#fff;box-shadow:var(--shadow)}
+  .btn-primary:hover{background:#10302d}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line-strong)}
+  .btn-ghost:hover{background:var(--surface-2)}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 70px}
+
+  /* login */
+  .login{max-width:430px;margin:8vh auto;background:var(--surface);border:1px solid var(--line);border-radius:22px;
+    box-shadow:var(--shadow);overflow:hidden}
+  .login-top{padding:28px 30px 6px}
+  .login-top h1{font-size:26px}
+  .login-top p{color:var(--ink-soft);font-size:14.5px;margin:8px 0 0}
+  .login-body{padding:20px 30px 30px}
+  .field{margin-bottom:15px}
+  label.lab{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:7px}
+  .inp{width:100%;padding:12px 14px;border-radius:11px;border:1px solid var(--line-strong);background:var(--surface);
+    font-family:inherit;font-size:15px;color:var(--text)}
+  .inp:focus{border-color:var(--ink);outline:none;box-shadow:0 0 0 3px rgba(23,63,59,.1)}
+  .login .btn{width:100%;justify-content:center;padding:14px;margin-top:4px}
+  .swap{text-align:center;font-size:13.5px;margin-top:16px;color:var(--ink-soft)}
+  .swap a{cursor:pointer;font-weight:600}
+  .msg{font-size:13px;font-weight:600;margin-top:12px;padding:10px 12px;border-radius:10px;display:none}
+  .msg.show{display:block}
+  .msg.err{background:var(--danger-soft);color:var(--danger)}
+  .msg.ok{background:var(--trade-soft);color:var(--trade)}
+
+  /* dashboard */
+  .head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  .head h1{font-size:30px}
+  .head p{color:var(--ink-soft);margin:6px 0 0;font-size:14.5px}
+  .stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;min-width:120px;box-shadow:var(--shadow)}
+  .stat .n{font-family:"Fraunces",serif;font-weight:600;font-size:26px;color:var(--ink)}
+  .stat .l{font-size:12.5px;color:var(--ink-soft);font-weight:500}
+
+  /* abas */
+  .tabs{display:flex;gap:22px;border-bottom:1px solid var(--line);margin-bottom:26px}
+  .tabbtn{background:none;border:none;padding:10px 2px 12px;font-weight:600;font-size:14.5px;color:var(--ink-soft);
+    border-bottom:3px solid transparent;cursor:pointer;font-family:inherit}
+  .tabbtn:hover{color:var(--ink)}
+  .tabbtn.active{color:var(--ink);border-bottom-color:var(--marigold)}
+
+  /* filtros de moderação */
+  .modtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .modbtn{background:var(--surface);border:1px solid var(--line-strong);border-radius:30px;padding:8px 16px;
+    font-weight:600;font-size:13.5px;color:var(--ink-soft);font-family:inherit;cursor:pointer;transition:.12s}
+  .modbtn:hover{background:var(--surface-2)}
+  .modbtn.active{background:var(--ink);border-color:var(--ink);color:#fff}
+  .mod-photo{width:64px;height:64px;border-radius:10px;object-fit:cover;flex:none;border:1px solid var(--line);background:var(--surface-2)}
+  .mod-noimg{width:64px;height:64px;border-radius:10px;flex:none;border:1px solid var(--line);background:var(--surface-2);
+    display:grid;place-items:center;color:var(--ink-soft);font-size:10px;font-weight:600;text-align:center}
+  .iconbtn.ok-act:hover{border-color:var(--trade);color:var(--trade);background:var(--trade-soft)}
+  .btn-approve{background:var(--trade);color:#fff;border:1px solid transparent}
+  .btn-approve:hover{background:#26795a}
+
+  /* visualização do anúncio de terceiro */
+  .vw-main{width:100%;height:300px;background:var(--surface-2);border:1px solid var(--line);border-radius:13px;overflow:hidden;display:grid;place-items:center}
+  .vw-main img{width:100%;height:100%;object-fit:contain}
+  .vw-main .noimg{color:var(--ink-soft);font-size:13px;font-weight:600}
+  .vw-thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .vw-thumb{width:62px;height:62px;border-radius:9px;overflow:hidden;border:2px solid var(--line-strong);cursor:pointer;background:var(--surface-2);padding:0}
+  .vw-thumb img{width:100%;height:100%;object-fit:cover}
+  .vw-thumb.on{border-color:var(--marigold)}
+  .vw-badges{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0 4px}
+  .vw-info{margin-top:14px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--surface)}
+  .vw-row{display:flex;justify-content:space-between;gap:18px;padding:11px 15px;border-bottom:1px solid var(--line)}
+  .vw-row:last-child{border-bottom:none}
+  .vw-row .k{color:var(--ink-soft);font-size:13px;font-weight:600;flex:none}
+  .vw-row .v{font-weight:600;text-align:right;word-break:break-word}
+  .vw-row .v a{font-weight:600}
+  .vw-desc{margin-top:14px;background:var(--surface-2);border:1px solid var(--line);border-radius:13px;padding:14px 16px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+  .vw-sec{font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--ink-soft);margin:18px 0 8px}
+
+  /* gráfico de acessos */
+  .chartcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px 14px;box-shadow:var(--shadow)}
+  .chartcard h3{font-size:13.5px;margin-bottom:16px;color:var(--ink-soft);font-family:"DM Sans",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  .bars{display:flex;align-items:stretch;gap:8px;height:130px;overflow-x:auto;padding-bottom:2px}
+  .bar-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-width:26px;flex:1}
+  .bar{width:100%;max-width:22px;background:var(--marigold);border-radius:5px 5px 2px 2px;align-self:center;min-height:4px}
+  .bar-l{font-size:9.5px;color:var(--ink-soft);font-weight:600;white-space:nowrap}
+
+  /* configurações */
+  .cfgcard{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px 26px;box-shadow:var(--shadow);max-width:520px}
+
+  .list{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:680px){.list{grid-template-columns:1fr}}
+  /* banners sempre empilhados, um abaixo do outro */
+  #list{grid-template-columns:1fr}
+  .row{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;gap:16px;
+    align-items:center;box-shadow:var(--shadow)}
+  .row .thumb{width:150px;height:64px;border-radius:10px;overflow:hidden;background:var(--surface-2);flex:none;
+    border:1px solid var(--line);display:grid;place-items:center;color:var(--ink-soft);font-size:12px;font-weight:600;text-align:center}
+  .row .thumb img{width:100%;height:100%;object-fit:cover}
+  .row .info{flex:1;min-width:0}
+  .row .info h3{font-size:16.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .info .sub{font-size:13px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .info .pos{display:inline-flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+  .badge{font-size:11px;font-weight:700;padding:4px 9px;border-radius:20px;letter-spacing:.2px}
+  .badge.topo{background:var(--marigold-soft);color:#9a6512}
+  .badge.cabecalho{background:var(--trade-soft);color:var(--trade)}
+  .badge.grade{background:var(--trade-soft);color:var(--trade)}
+  .badge.rodape{background:var(--doa-soft);color:var(--doa)}
+  .badge.on{background:var(--trade);color:#fff}
+  .badge.off{background:#ECE6D8;color:var(--ink-soft)}
+  .row .acts{display:flex;gap:8px;flex:none}
+  .iconbtn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);
+    display:grid;place-items:center;color:var(--ink)}
+  .iconbtn:hover{background:var(--surface-2)}
+  .iconbtn.del:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-soft)}
+  .iconbtn svg{width:18px;height:18px}
+  .switch{position:relative;width:46px;height:26px;flex:none}
+  .switch input{opacity:0;width:0;height:0}
+  .slider{position:absolute;inset:0;background:#D8CDB4;border-radius:30px;transition:.2s;cursor:pointer}
+  .slider::before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .switch input:checked + .slider{background:var(--trade)}
+  .switch input:checked + .slider::before{transform:translateX(20px)}
+
+  .empty{text-align:center;padding:50px 24px;background:var(--surface);border:1px dashed var(--line-strong);border-radius:20px;color:var(--ink-soft)}
+  .empty h3{font-size:21px;margin-bottom:6px}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(16,32,30,.5);backdrop-filter:blur(3px);z-index:60;
+    display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:auto}
+  .scrim.open{display:flex}
+  .modal{background:var(--paper);border-radius:22px;width:100%;max-width:620px;margin:auto;box-shadow:var(--shadow-lg);overflow:hidden}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:var(--paper);z-index:2}
+  .modal-head h2{font-size:22px}
+  .xclose{width:36px;height:36px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);display:grid;place-items:center}
+  .xclose svg{width:18px;height:18px}
+  .modal-body{padding:22px 24px}
+  .field.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  textarea.inp{resize:vertical;min-height:64px}
+  .seg{display:flex;gap:8px}
+  .seg label{flex:1}
+  .seg input{position:absolute;opacity:0}
+  .seg .opt-b{display:flex;flex-direction:column;gap:2px;align-items:center;padding:11px 6px;border:1px solid var(--line-strong);
+    border-radius:11px;background:var(--surface);font-weight:600;font-size:13px;text-align:center;color:var(--ink-soft)}
+  .seg .opt-b small{font-weight:500;font-size:10.5px}
+  .seg input:checked + .opt-b{border-color:var(--ink);background:var(--ink);color:#fff}
+  .drop{border:2px dashed var(--line-strong);border-radius:13px;padding:18px;text-align:center;background:var(--surface);color:var(--ink-soft);cursor:pointer}
+  .drop:hover{border-color:var(--marigold);background:var(--surface-2)}
+  .drop svg{width:24px;height:24px;color:var(--marigold);margin-bottom:4px}
+  .drop b{color:var(--ink)}
+  .prev{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative;background:var(--surface);height:160px}
+  .prev .ad-sponsor{position:absolute;top:8px;right:8px;background:rgba(20,40,37,.62);color:#fff;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;z-index:3}
+  .prev img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
+  .prev .ph{padding:30px;text-align:center;color:var(--ink-soft);font-size:13px;position:relative;z-index:2}
+  .prev .overlay-txt{position:absolute;z-index:2;max-width:80%;line-height:1.25;pointer-events:none;word-break:break-word}
+  /* seção tipografia sobreposta */
+  .txt-overlay-section{background:var(--surface-2);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin-top:4px}
+  .txt-overlay-section .sec-title{font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--ink-soft);margin-bottom:14px}
+  .color-row{display:flex;align-items:center;gap:10px}
+  .color-swatch{width:36px;height:36px;border-radius:9px;border:2px solid var(--line-strong);cursor:pointer;padding:0;background:none;overflow:hidden;flex:none}
+  .color-swatch input[type=color]{width:150%;height:150%;margin:-25%;border:none;padding:0;cursor:pointer;background:none}
+  .font-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .toggle-group{display:flex;gap:6px}
+  .tog{width:36px;height:36px;border-radius:9px;border:1px solid var(--line-strong);background:var(--surface);font-size:14px;font-weight:700;color:var(--ink-soft);cursor:pointer;display:grid;place-items:center;transition:.12s}
+  .tog.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .pos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:126px}
+  .pos-cell{width:38px;height:38px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);cursor:pointer;display:grid;place-items:center;transition:.12s}
+  .pos-cell.on{background:var(--ink);border-color:var(--ink)}
+  .pos-cell svg{width:13px;height:13px;color:var(--ink-soft)}
+  .pos-cell.on svg{color:#fff}
+  .toggle-row{display:flex;align-items:center;gap:12px;margin-top:4px}
+  .form-foot{display:flex;gap:12px;justify-content:flex-end;padding-top:10px;border-top:1px solid var(--line);margin-top:8px}
+  .help-txt{font-size:12px;color:var(--ink-soft);margin-top:6px}
+
+  .toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:90;display:flex;flex-direction:column;gap:10px;width:calc(100% - 32px);max-width:420px}
+  .toast{background:var(--ink);color:#fff;padding:14px 18px;border-radius:13px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:11px;font-size:14px;font-weight:500}
+  .toast.ok{background:var(--trade)}.toast.bad{background:var(--danger)}
+  .toast svg{width:19px;height:19px;flex:none}
+
+  .setup{max-width:620px;margin:8vh auto;background:var(--surface);border:1px solid var(--line-strong);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+  .setup-top{background:var(--ink);color:#fff;padding:24px 26px}.setup-top h2{color:#fff}
+  .setup-body{padding:22px 26px}.setup-body code{font-family:ui-monospace,monospace;font-size:12.5px;background:var(--surface-2);padding:2px 5px;border-radius:5px}
+  .hide{display:none!important}
+  @media(max-width:560px){
+    .field.row2{grid-template-columns:1fr}
+    .row{flex-wrap:wrap}.row .thumb{width:100%;height:120px}.row .acts{margin-left:auto}
+    .head h1{font-size:24px}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M3 8h18l-1.5 11.2a2 2 0 0 1-2 1.8H6.5a2 2 0 0 1-2-1.8L3 8Z" fill="#fff"/><path d="M8 8V6a4 4 0 1 1 8 0v2" stroke="#DD942F" stroke-width="2" fill="none"/></svg></span>
+      <div><div class="brand-name">Passa<b>Market</b></div><div class="brand-sub">Painel de anúncios</div></div>
+    </div>
+    <span class="who hide" id="whoami"></span>
+    <button class="btn btn-ghost hide" id="logoutBtn" onclick="Panel.logout()">Sair</button>
+  </div>
+</header>
+
+<!-- SETUP -->
+<section class="setup hide" id="setupCard">
+  <div class="setup-top"><h2>Configure o Firebase</h2><p style="opacity:.85;margin:8px 0 0">Cole o <code>firebaseConfig</code> no topo deste arquivo, igual fez no portal.</p></div>
+  <div class="setup-body">
+    <p>Este painel precisa, além do que o portal já usa:</p>
+    <ol>
+      <li>Ativar o provedor <b>E-mail/senha</b> em <b>Authentication → Sign-in method</b>.</li>
+      <li>Criar o seu usuário administrador (na primeira vez, use o botão <b>Criar conta de administrador</b> nesta tela).</li>
+      <li>Publicar as regras do Firestore para a coleção <code>banners</code> (veja abaixo), trocando pelo <b>seu e-mail</b>.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- LOGIN -->
+<section class="login hide" id="loginCard">
+  <div class="login-top">
+    <h1 id="loginTitle">Acesso do administrador</h1>
+    <p id="loginSub">Entre para gerenciar os anúncios exibidos no portal.</p>
+  </div>
+  <div class="login-body">
+    <div class="field"><label class="lab" for="email">E-mail</label><input class="inp" id="email" type="email" autocomplete="username" placeholder="voce@exemplo.com"></div>
+    <div class="field"><label class="lab" for="senha">Senha</label><input class="inp" id="senha" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="btn btn-primary" id="loginBtn" onclick="Panel.auth()">Entrar</button>
+    <div class="msg" id="loginMsg"></div>
+    <div class="swap" id="swapLine">Primeiro acesso? <a onclick="Panel.toggleMode()">Criar conta de administrador</a></div>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<main class="wrap hide" id="dash">
+  <div class="tabs" id="panelTabs">
+    <button class="tabbtn active" data-tab="overview" onclick="Panel.switchTab('overview')">Visão geral</button>
+    <button class="tabbtn" data-tab="users" onclick="Panel.switchTab('users')">Usuários</button>
+    <button class="tabbtn" data-tab="moderacao" onclick="Panel.switchTab('moderacao')">Anúncios de terceiros</button>
+    <button class="tabbtn" data-tab="settings" onclick="Panel.switchTab('settings')">Configurações</button>
+    <button class="tabbtn" data-tab="banners" onclick="Panel.switchTab('banners')">Banners</button>
+  </div>
+
+  <!-- ABA: VISÃO GERAL -->
+  <section id="tabOverview" class="tabpanel">
+    <div class="head">
+      <div>
+        <h1>Visão geral</h1>
+        <p>Usuários e acessos ao portal Passa Market.</p>
+      </div>
+    </div>
+    <div class="stats" id="overviewStats"></div>
+    <p class="help-txt" style="margin-bottom:18px">"Usuários cadastrados" é o total de pessoas que fizeram o cadastro (nome, WhatsApp e e-mail) para anunciar no portal. "Acessos" conta visitantes únicos por dia, identificados de forma anônima pelo navegador.</p>
+    <div class="chartcard">
+      <h3>Acessos nos últimos 14 dias</h3>
+      <div class="bars" id="accessBars"></div>
+    </div>
+  </section>
+
+  <!-- ABA: USUÁRIOS -->
+  <section id="tabUsers" class="tabpanel hide">
+    <div class="head">
+      <div>
+        <h1>Usuários cadastrados</h1>
+        <p>Pessoas que se cadastraram para anunciar no portal.</p>
+      </div>
+    </div>
+    <div class="list" id="usersList"></div>
+    <section class="empty hide" id="usersEmpty">
+      <h3>Nenhum usuário cadastrado ainda</h3>
+      <p>Os cadastros feitos no portal (nome, WhatsApp e e-mail) aparecem aqui.</p>
+    </section>
+  </section>
+
+  <!-- ABA: CONFIGURAÇÕES -->
+  <section id="tabSettings" class="tabpanel hide">
+    <div class="head">
+      <div>
+        <h1>Configurações de anúncios</h1>
+        <p>Regras que valem para todos os anúncios criados pelos usuários no portal.</p>
+      </div>
+    </div>
+    <div class="cfgcard">
+      <form id="cfgForm" onsubmit="Panel.saveConfig(event)">
+        <div class="field">
+          <label class="lab" for="cfgPrazo">Prazo de validade dos anúncios (dias)</label>
+          <input class="inp" id="cfgPrazo" type="number" min="0" step="1" value="0">
+          <div class="help-txt">Anúncios mais antigos que esse número de dias saem da listagem pública automaticamente. Use <b>0</b> para não aplicar prazo.</div>
+        </div>
+        <div class="field">
+          <label class="lab" for="cfgLimite">Limite de anúncios ativos por usuário</label>
+          <input class="inp" id="cfgLimite" type="number" min="0" step="1" value="0">
+          <div class="help-txt">Cada família poderá ter no máximo esse número de anúncios ativos ao mesmo tempo. Use <b>0</b> para não aplicar limite.</div>
+        </div>
+        <div class="msg" id="cfgMsg"></div>
+        <div class="form-foot">
+          <button type="submit" class="btn btn-primary" id="cfgSaveBtn">Salvar configurações</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ABA: BANNERS -->
+  <section id="tabBanners" class="tabpanel hide">
+    <div class="head">
+      <div>
+        <h1>Anúncios do portal</h1>
+        <p>Cadastre banners que aparecem para os usuários. Eles entram no ar assim que ficam <b>ativos</b>.</p>
+      </div>
+      <button class="btn btn-primary" onclick="Panel.openForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+        Novo banner
+      </button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+    <div class="list" id="list"></div>
+
+    <section class="empty hide" id="emptyState">
+      <h3>Nenhum anúncio cadastrado</h3>
+      <p>Crie o primeiro banner para começar a veicular publicidade no portal.</p>
+      <button class="btn btn-primary" onclick="Panel.openForm()" style="margin-top:8px">Criar primeiro banner</button>
+    </section>
+  </section>
+
+  <!-- ABA: ANÚNCIOS DE TERCEIROS (MODERAÇÃO) -->
+  <section id="tabModeracao" class="tabpanel hide">
+    <div class="head">
+      <div>
+        <h1>Anúncios de terceiros</h1>
+        <p>Anúncios de produtos e serviços cadastrados pelos usuários. Aprove os que seguem as diretrizes e reprove ou exclua os que estiverem <b>fora do nicho</b> ou violando as regras do portal.</p>
+      </div>
+      <button class="btn btn-ghost" onclick="Panel.loadModeracao()" title="Recarregar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 1 3 6.7"/><path d="M3 16v-4h4"/></svg>
+        Atualizar
+      </button>
+    </div>
+
+    <div class="modtabs" id="modFilters">
+      <button class="modbtn active" data-mf="pendente" onclick="Panel.setModFilter('pendente')">Em avaliação</button>
+      <button class="modbtn" data-mf="ativo" onclick="Panel.setModFilter('ativo')">No ar</button>
+      <button class="modbtn" data-mf="reprovado" onclick="Panel.setModFilter('reprovado')">Reprovados</button>
+      <button class="modbtn" data-mf="todos" onclick="Panel.setModFilter('todos')">Todos</button>
+    </div>
+
+    <div class="stats" id="modStats"></div>
+    <div class="list" id="modList"></div>
+
+    <section class="empty hide" id="modEmpty">
+      <h3>Nada por aqui</h3>
+      <p>Nenhum anúncio de terceiro neste filtro.</p>
+    </section>
+  </section>
+</main>
+
+<!-- MODAL FORM -->
+<div class="scrim" id="formScrim">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h2 id="formTitle">Novo banner</h2>
+      <button class="xclose" onclick="Panel.closeForm()" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <form id="adForm" onsubmit="Panel.save(event)">
+        <input type="hidden" id="editId">
+        <div class="field">
+          <label class="lab" for="titulo">Nome / título do anúncio</label>
+          <input class="inp" id="titulo" placeholder="Ex.: Papelaria do Bairro — 20% off" required>
+        </div>
+        <div class="field">
+          <label class="lab" for="descricao">Chamada <span style="font-weight:500;color:var(--ink-soft)">(aparece quando não há imagem ou no cartão)</span></label>
+          <input class="inp" id="descricao" placeholder="Ex.: Loja Tal — 20% off em todos os produtos">
+        </div>
+        <div class="field">
+          <label class="lab" for="link">Link de destino</label>
+          <input class="inp" id="link" type="text" placeholder="https://...  ou um WhatsApp: 82900000000" onblur="Panel.onBlurLink()">
+          <div class="help-txt">Para onde a pessoa vai ao tocar no anúncio. Digite um site (com <code>https://</code>) ou apenas um número de WhatsApp no formato <code>82900000000</code> — viramos o link <code>wa.me</code> automaticamente. Dica: adicione <code>?utm_source=passamarket</code> para medir no seu site.</div>
+        </div>
+        <div class="field">
+          <label class="lab" for="mensagem">Mensagem do WhatsApp <span style="font-weight:500;color:var(--ink-soft)">(opcional — só para links de WhatsApp)</span></label>
+          <textarea class="inp" id="mensagem" rows="3" placeholder="Ex.: Olá! Vi o anúncio da Papelaria do Bairro no Passa Market e quero saber mais sobre as ofertas."></textarea>
+          <div class="help-txt">É a mensagem que já vem escrita quando a pessoa clica no banner e abre o WhatsApp. Se deixar vazio, geramos uma mensagem automática com o título do anúncio.</div>
+        </div>
+        <div class="field">
+          <label class="lab">Posição no portal</label>
+          <div class="seg" id="posSeg">
+            <label><input type="radio" name="pos" value="cabecalho" onchange="Panel.syncPreview()"><span class="opt-b">Abaixo do cabeçalho<small>faixa 1100×300</small></span></label>
+            <label><input type="radio" name="pos" value="topo" checked onchange="Panel.syncPreview()"><span class="opt-b">Topo da lista<small>faixa 1100×300</small></span></label>
+            <label><input type="radio" name="pos" value="rodape" onchange="Panel.syncPreview()"><span class="opt-b">Rodapé<small>faixa 1100×300</small></span></label>
+          </div>
+        </div>
+        <div class="field row2">
+          <div>
+            <label class="lab" for="ordem">Ordem de exibição</label>
+            <input class="inp" id="ordem" type="number" value="0" min="0" step="1">
+            <div class="help-txt">Menor número aparece primeiro.</div>
+          </div>
+          <div>
+            <label class="lab">Status</label>
+            <div class="toggle-row">
+              <span class="switch"><input type="checkbox" id="ativo" checked><span class="slider"></span></span>
+              <span id="ativoLbl" style="font-weight:600">Ativo (no ar)</span>
+            </div>
+          </div>
+        </div>
+        <div class="field row2">
+          <div>
+            <label class="lab" for="validoAte">Válido até <span style="font-weight:500;color:var(--ink-soft)">(prazo do banner)</span></label>
+            <input class="inp" id="validoAte" type="date">
+            <div class="help-txt">Deixe em branco para sem prazo. O banner sai do ar automaticamente após essa data.</div>
+          </div>
+          <div>
+            <label class="lab" for="tempoBanner">Tempo no slide (segundos)</label>
+            <input class="inp" id="tempoBanner" type="number" value="6" min="3" max="60" step="1">
+            <div class="help-txt">Quanto tempo este banner fica visível antes de avançar. Mín. 3 s.</div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="lab">Tipo de mídia</label>
+          <div class="seg" id="midiaSeg">
+            <label><input type="radio" name="midia" value="imagem" checked onchange="Panel.syncMidia()"><span class="opt-b">Imagem<small>foto / arte</small></span></label>
+            <label><input type="radio" name="midia" value="video" onchange="Panel.syncMidia()"><span class="opt-b">Vídeo<small>YouTube</small></span></label>
+          </div>
+        </div>
+        <div class="field hide" id="videoField">
+          <label class="lab" for="videoUrl">Link do vídeo (YouTube)</label>
+          <input class="inp" id="videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=..." oninput="Panel.syncPreview()">
+          <div class="help-txt">O vídeo abre <b>dentro do portal</b> quando a pessoa toca no banner e pode ser visto em <b>tela cheia</b>. A imagem abaixo é opcional — sem ela, usamos a capa do próprio vídeo.</div>
+        </div>
+        <div class="field">
+          <label class="lab">Imagem do banner</label>
+          <div class="drop" onclick="document.getElementById('imgInput').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div><b id="dropLbl">Toque para enviar a imagem</b></div>
+            <div class="help-txt" style="margin-top:2px">Compactada automaticamente • JPG/PNG</div>
+          </div>
+          <input type="file" id="imgInput" accept="image/*" class="hide" onchange="Panel.pickImage(event)">
+          <div class="prev topo" id="preview"><div class="ph">A pré-visualização aparece aqui</div></div>
+        </div>
+
+        <!-- TEXTO SOBREPOSTO NA IMAGEM -->
+        <div class="field" id="overlaySection">
+          <label class="lab">Texto sobre a imagem <span style="font-weight:500;color:var(--ink-soft)">(opcional — só aparece quando há imagem)</span></label>
+          <div class="txt-overlay-section">
+            <div class="sec-title">Imagem de fundo</div>
+            <div class="field" style="margin-bottom:16px">
+              <label class="lab" style="margin-bottom:6px">Escurecer a imagem para destacar o texto: <b id="scrimVal">40%</b></label>
+              <input type="range" id="overlayScrim" min="0" max="85" value="40" step="5" style="width:100%;accent-color:var(--ink)" oninput="Panel.syncPreview()">
+              <div class="help-txt">Aplica uma camada escura semitransparente sobre a imagem (ou sobre a capa do vídeo). Quanto maior, mais o texto claro se destaca.</div>
+            </div>
+
+            <div class="sec-title">Conteúdo</div>
+            <div class="field" style="margin-bottom:12px">
+              <input class="inp" id="overlayTitulo" placeholder="Título em destaque (ex.: 20% OFF)" oninput="Panel.syncPreview()">
+            </div>
+            <div class="field" style="margin-bottom:16px">
+              <input class="inp" id="overlaySub" placeholder="Subtítulo (ex.: só esta semana)" oninput="Panel.syncPreview()">
+            </div>
+
+            <div class="sec-title">Tipografia</div>
+            <div class="font-grid" style="margin-bottom:14px">
+              <div>
+                <label class="lab" style="margin-bottom:6px">Fonte</label>
+                <div class="sel" style="position:relative">
+                  <select class="inp" id="overlayFont" onchange="Panel.syncPreview()" style="padding-right:34px;appearance:none">
+                    <option value="DM Sans">DM Sans (padrão)</option>
+                    <option value="Fraunces">Fraunces (serif)</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Impact">Impact</option>
+                    <option value="ui-monospace">Monospace</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="lab" style="margin-bottom:6px">Tamanho (px)</label>
+                <input class="inp" id="overlaySize" type="number" value="28" min="12" max="72" step="1" oninput="Panel.syncPreview()">
+              </div>
+            </div>
+
+            <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px">
+              <div>
+                <label class="lab" style="margin-bottom:8px">Cor do texto</label>
+                <div class="color-row">
+                  <button type="button" class="color-swatch" title="Cor do título"><input type="color" id="overlayColor" value="#ffffff" oninput="Panel.syncPreview()"></button>
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--ink)">Título</div>
+                    <div style="font-size:11px;color:var(--ink-soft)" id="overlayColorHex">#ffffff</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label class="lab" style="margin-bottom:8px">Cor do subtítulo</label>
+                <div class="color-row">
+                  <button type="button" class="color-swatch" title="Cor do subtítulo"><input type="color" id="overlaySubColor" value="#f0f0f0" oninput="Panel.syncPreview()"></button>
+                  <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--ink)">Subtítulo</div>
+                    <div style="font-size:11px;color:var(--ink-soft)" id="overlaySubColorHex">#f0f0f0</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label class="lab" style="margin-bottom:8px">Estilo</label>
+                <div class="toggle-group">
+                  <button type="button" class="tog" id="togBold" title="Negrito" onclick="Panel.toggleTog('togBold');Panel.syncPreview()"><b>B</b></button>
+                  <button type="button" class="tog" id="togItalic" title="Itálico" onclick="Panel.toggleTog('togItalic');Panel.syncPreview()"><i>I</i></button>
+                  <button type="button" class="tog on" id="togShadow" title="Sombra no texto" onclick="Panel.toggleTog('togShadow');Panel.syncPreview()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="3" y="3" width="13" height="13" rx="2"/><rect x="8" y="8" width="13" height="13" rx="2" opacity=".4"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="sec-title">Posição na imagem</div>
+            <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+              <div class="pos-grid" id="posGrid">
+                <button type="button" class="pos-cell" data-pos="top-left"    onclick="Panel.setOverlayPos('top-left')"    title="Topo esquerda">   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 5h6M5 5v6"/></svg></button>
+                <button type="button" class="pos-cell" data-pos="top-center"  onclick="Panel.setOverlayPos('top-center')"  title="Topo centro">     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v6M8 5h8"/></svg></button>
+                <button type="button" class="pos-cell" data-pos="top-right"   onclick="Panel.setOverlayPos('top-right')"   title="Topo direita">    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 5h-6M19 5v6"/></svg></button>
+                <button type="button" class="pos-cell" data-pos="mid-left"    onclick="Panel.setOverlayPos('mid-left')"    title="Meio esquerda">   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h6M5 9v6"/></svg></button>
+                <button type="button" class="pos-cell on" data-pos="mid-center" onclick="Panel.setOverlayPos('mid-center')" title="Centro">         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/></svg></button>
+                <button type="button" class="pos-cell" data-pos="mid-right"   onclick="Panel.setOverlayPos('mid-right')"   title="Meio direita">    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12h-6M19 9v6"/></svg></button>
+                <button type="button" class="pos-cell" data-pos="bot-left"    onclick="Panel.setOverlayPos('bot-left')"    title="Rodapé esquerda"> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 19h6M5 19v-6"/></svg></button>
+                <button type="button" class="pos-cell" data-pos="bot-center"  onclick="Panel.setOverlayPos('bot-center')"  title="Rodapé centro">   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19v-6M8 19h8"/></svg></button>
+                <button type="button" class="pos-cell" data-pos="bot-right"   onclick="Panel.setOverlayPos('bot-right')"   title="Rodapé direita">  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 19h-6M19 19v-6"/></svg></button>
+              </div>
+              <div style="font-size:12px;color:var(--ink-soft);line-height:1.6">
+                Escolha onde o<br>texto aparece<br>na imagem.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="msg" id="formMsg"></div>
+        <div class="form-foot">
+          <button type="button" class="btn btn-ghost" onclick="Panel.closeForm()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn">Publicar banner</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VISUALIZAR ANÚNCIO DE TERCEIRO -->
+<div class="scrim" id="viewScrim">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h2 id="viewTitle">Anúncio</h2>
+      <button class="xclose" onclick="Panel.closeView()" aria-label="Fechar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body" id="viewBody"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script type="module">
+/* ============================================================
+   CONFIGURAÇÃO DO FIREBASE — use a MESMA do portal
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBgQ6xDCv2_2rRK85Upy8zqCy3jiE06Jio",
+  authDomain: "mercado-livre-mcz.firebaseapp.com",
+  projectId: "mercado-livre-mcz",
+  storageBucket: "mercado-livre-mcz.firebasestorage.app",
+  messagingSenderId: "942064381996",
+  appId: "1:942064381996:web:1ee8e1fcfca1857b85a189",
+  measurementId: "G-FHMJZ0TE1Z"
+};
+/* (Opcional) restringe o painel a um e-mail. Deixe "" para não restringir no cliente
+   — a segurança real fica nas regras do Firestore de qualquer forma. */
+const ADMIN_EMAIL = "";
+/* ============================================================ */
+
+const isConfigured = !String(firebaseConfig.apiKey).startsWith("COLE_AQUI");
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp,
+         getDoc, setDoc, where, getDocs, getCountFromServer }
+  from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+let auth=null, db=null, ref=null, ADS=[], signupMode=false, pendingImg=null, editing=null;
+let usuariosRef=null, acessosRef=null, configRef=null, anunciosRef=null;
+let MOD_ADS=[], modFilter="pendente", USERS_CACHE=[];
+let viewPhotos=[], viewIdx=0;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function ytId(url){
+  if(!url)return "";
+  const s=String(url).trim();
+  if(/^[A-Za-z0-9_-]{11}$/.test(s))return s;
+  let m=s.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  if(m)return m[1];
+  m=s.match(/[?&]v=([A-Za-z0-9_-]{11})/);
+  return m?m[1]:"";
+}
+
+function toast(msg,kind=""){
+  const t=document.createElement("div");t.className="toast "+kind;
+  t.innerHTML=(kind==="ok"?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>':kind==="bad"?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>':'')+"<span>"+esc(msg)+"</span>";
+  $("toasts").appendChild(t);setTimeout(()=>t.remove(),3200);
+}
+function msg(el,text,kind){el.className="msg show "+kind;el.textContent=text;}
+function clearMsg(el){el.className="msg";}
+
+function compress(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>{const img=new Image();img.onload=()=>{
+      const max=1280;let{width:w,height:h}=img;
+      if(w>h&&w>max){h=h*max/w;w=max;}else if(h>=w&&h>max){w=w*max/h;h=max;}
+      const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);
+      let q=0.7,out=c.toDataURL("image/jpeg",q);
+      while(out.length>230000&&q>0.35){q-=0.08;out=c.toDataURL("image/jpeg",q);}
+      res(out);
+    };img.onerror=rej;img.src=e.target.result;};
+    r.onerror=rej;r.readAsDataURL(file);
+  });
+}
+
+/* ---------------- util de data (acessos) ---------------- */
+function dateStr(d=new Date()){
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+
+const Panel={
+  // Converte o que foi digitado no campo "Link de destino".
+  // Se for um número de WhatsApp (ex.: 82900000000), gera https://wa.me/55...
+  // (A mensagem do WhatsApp é montada no portal, conforme o assunto do banner.)
+  normalizeLink(raw){
+    let v=(raw||"").trim();
+    if(!v) return "";
+    if(/^https?:\/\//i.test(v)) return v;                           // já é URL completa
+    if(/^(wa\.me|api\.whatsapp\.com)/i.test(v)) return "https://"+v; // wa.me sem https
+    const dig=v.replace(/[^\d]/g,"");                               // só dígitos
+    if(/^\d{10,13}$/.test(dig)){                                    // telefone BR
+      let num=dig;
+      const temCodigoPais=/^55/.test(num)&&(num.length===12||num.length===13);
+      if(!temCodigoPais&&(num.length===10||num.length===11)) num="55"+num;
+      return "https://wa.me/"+num;
+    }
+    if(/^[\w.-]+\.[a-z]{2,}([\/?#].*)?$/i.test(v)) return "https://"+v; // domínio sem https
+    return v;
+  },
+  // Ao sair do campo, mostra o link já convertido (confirmação visual)
+  onBlurLink(){
+    const el=$("link"); if(!el) return;
+    const norm=this.normalizeLink(el.value);
+    if(norm && norm!==el.value.trim()) el.value=norm;
+  },
+  toggleMode(){
+    signupMode=!signupMode;
+    $("loginTitle").textContent=signupMode?"Criar conta de administrador":"Acesso do administrador";
+    $("loginSub").textContent=signupMode?"Crie a conta que vai gerenciar os anúncios. Use o mesmo e-mail definido nas regras.":"Entre para gerenciar os anúncios exibidos no portal.";
+    $("loginBtn").textContent=signupMode?"Criar conta":"Entrar";
+    $("swapLine").innerHTML=signupMode?'Já tem conta? <a onclick="Panel.toggleMode()">Entrar</a>':'Primeiro acesso? <a onclick="Panel.toggleMode()">Criar conta de administrador</a>';
+    clearMsg($("loginMsg"));
+  },
+  async auth(){
+    const email=$("email").value.trim(),senha=$("senha").value;
+    if(!email||!senha)return msg($("loginMsg"),"Preencha e-mail e senha.","err");
+    if(ADMIN_EMAIL&&email.toLowerCase()!==ADMIN_EMAIL.toLowerCase())
+      return msg($("loginMsg"),"Este e-mail não é o administrador configurado.","err");
+    $("loginBtn").disabled=true;
+    try{
+      if(signupMode)await createUserWithEmailAndPassword(auth,email,senha);
+      else await signInWithEmailAndPassword(auth,email,senha);
+    }catch(e){
+      const m={"auth/invalid-credential":"E-mail ou senha incorretos.","auth/wrong-password":"Senha incorreta.",
+        "auth/user-not-found":"Conta não encontrada. Use \"Criar conta\".","auth/email-already-in-use":"Já existe conta com esse e-mail. Use \"Entrar\".",
+        "auth/weak-password":"A senha precisa de ao menos 6 caracteres.","auth/invalid-email":"E-mail inválido.",
+        "auth/operation-not-allowed":"Ative o provedor E-mail/senha no Firebase (Authentication)."}[e.code];
+      msg($("loginMsg"),m||("Erro: "+e.code),"err");
+    }finally{$("loginBtn").disabled=false;}
+  },
+  logout(){signOut(auth);},
+
+  /* ---------- abas ---------- */
+  switchTab(name){
+    const map={overview:"tabOverview",users:"tabUsers",moderacao:"tabModeracao",settings:"tabSettings",banners:"tabBanners"};
+    Object.entries(map).forEach(([k,id])=>$(id).classList.toggle("hide",k!==name));
+    document.querySelectorAll("#panelTabs .tabbtn").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
+    if(name==="overview")this.loadOverview();
+    if(name==="users")this.loadUsers();
+    if(name==="moderacao")this.loadModeracao();
+    if(name==="settings")this.loadConfigForm();
+  },
+
+  /* ---------- usuários cadastrados ---------- */
+  async loadUsers(){
+    const wrap=$("usersList");
+    wrap.innerHTML=`<p style="color:var(--ink-soft);font-size:13px">Carregando…</p>`;
+    $("usersEmpty").classList.add("hide");
+    try{
+      const snap=await getDocs(query(usuariosRef,where("cadastrado","==",true)));
+      let users=snap.docs.map(d=>({id:d.id,...d.data()}));
+      // ordena pelos mais recentes (client-side, evita índice composto)
+      users.sort((a,b)=>{
+        const ta=a.cadastradoEm?.toMillis?a.cadastradoEm.toMillis():0;
+        const tb=b.cadastradoEm?.toMillis?b.cadastradoEm.toMillis():0;
+        return tb-ta;
+      });
+      if(!users.length){wrap.innerHTML="";$("usersEmpty").classList.remove("hide");return;}
+      USERS_CACHE=users;
+      wrap.innerHTML=users.map(u=>{
+        const nome=esc(u.nome||"(sem nome)");
+        const email=u.email?esc(u.email):"—";
+        const fone=esc(u.whatsapp||"");
+        const waDigits=String(u.whatsapp||"").replace(/\D/g,"");
+        const waHref=waDigits?`https://wa.me/${waDigits.length<=11?'55'+waDigits:waDigits}`:"";
+        const data=u.cadastradoEm?.toMillis?new Date(u.cadastradoEm.toMillis()).toLocaleDateString("pt-BR"):"";
+        return `<div class="row">
+          <div class="thumb" style="width:46px;height:46px;border-radius:50%;background:var(--marigold-soft);color:#9a6512;font-size:17px">
+            ${esc((u.nome||"?").trim().charAt(0).toUpperCase()||"?")}
+          </div>
+          <div class="info">
+            <h3>${nome}</h3>
+            <div class="sub">${email}${fone?" • "+fone:""}</div>
+            <div class="pos">
+              ${waHref?`<a class="badge grade" style="text-decoration:none" href="${waHref}" target="_blank" rel="noopener">WhatsApp</a>`:""}
+              ${data?`<span class="badge off">cadastrado em ${data}</span>`:""}
+            </div>
+          </div>
+          <div class="acts">
+            <button class="iconbtn del" title="Excluir usuário" onclick="Panel.removeUser('${u.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+          </div>
+        </div>`;
+      }).join("");
+    }catch(err){
+      console.error(err);
+      const code=err.code||err.message||"desconhecido";
+      wrap.innerHTML=`<div class="empty" style="border-color:var(--danger);background:var(--danger-soft)">
+        <h3 style="color:var(--danger)">Não consegui carregar os usuários</h3>
+        <p style="color:var(--danger)"><b>Código:</b> <code>${esc(code)}</code></p>
+        <p>Confira se as regras do Firestore liberam a leitura de <code>usuarios</code> para o seu e-mail de administrador.</p></div>`;
+    }
+  },
+
+  async removeUser(id){
+    const u=USERS_CACHE.find(x=>x.id===id);
+    const nome=u?(u.nome||u.email||"este usuário"):"este usuário";
+    if(!confirm(`Excluir o cadastro de "${nome}"?\n\nIsto remove o registro do usuário no portal. Os anúncios dele continuam na aba "Anúncios de terceiros", onde você pode removê-los individualmente.`))return;
+    try{
+      await deleteDoc(doc(db,"usuarios",id));
+      USERS_CACHE=USERS_CACHE.filter(x=>x.id!==id);
+      toast("Usuário excluído.","ok");
+      this.loadUsers();
+    }catch(err){
+      console.error(err);
+      toast(err.code==="permission-denied"?"Sem permissão. Confira nas regras do Firestore se o seu e-mail pode excluir 'usuarios'.":"Não foi possível excluir o usuário.","bad");
+    }
+  },
+
+  /* ---------- moderação: anúncios de terceiros (coleção marketplace) ---------- */
+  async loadModeracao(){
+    const wrap=$("modList");
+    wrap.innerHTML=`<p style="color:var(--ink-soft);font-size:13px">Carregando…</p>`;
+    $("modEmpty").classList.add("hide");
+    try{
+      const snap=await getDocs(anunciosRef);
+      MOD_ADS=snap.docs.map(d=>({id:d.id,...d.data()}));
+      MOD_ADS.sort((a,b)=>{
+        const ta=a.createdAt?.toMillis?a.createdAt.toMillis():0;
+        const tb=b.createdAt?.toMillis?b.createdAt.toMillis():0;
+        return tb-ta;
+      });
+      this.renderModeracao();
+    }catch(err){
+      console.error(err);
+      const code=err.code||err.message||"desconhecido";
+      wrap.innerHTML=`<div class="empty" style="border-color:var(--danger);background:var(--danger-soft)">
+        <h3 style="color:var(--danger)">Não consegui carregar os anúncios</h3>
+        <p style="color:var(--danger)"><b>Código:</b> <code>${esc(code)}</code></p>
+        <p>Confira se as regras do Firestore liberam a leitura de <code>marketplace</code>.</p></div>`;
+    }
+  },
+  setModFilter(f){
+    modFilter=f;
+    document.querySelectorAll("#modFilters .modbtn").forEach(b=>b.classList.toggle("active",b.dataset.mf===f));
+    this.renderModeracao();
+  },
+  renderModeracao(){
+    const all=MOD_ADS;
+    const pend=all.filter(a=>(a.status||"ativo")==="pendente");
+    const ativos=all.filter(a=>(a.status||"ativo")==="ativo");
+    const reprovados=all.filter(a=>a.status==="reprovado");
+    $("modStats").innerHTML=[
+      ["Em avaliação",pend.length],["No ar",ativos.length],["Reprovados",reprovados.length],["Total",all.length],
+    ].map(([l,n])=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+
+    const list = modFilter==="pendente"?pend : modFilter==="ativo"?ativos : modFilter==="reprovado"?reprovados : all;
+    const wrap=$("modList");
+    if(!list.length){wrap.innerHTML="";$("modEmpty").classList.remove("hide");return;}
+    $("modEmpty").classList.add("hide");
+
+    const tipoLabel={venda:"Venda",troca:"Troca",doacao:"Doação",orcamento:"Orçamento"};
+    wrap.innerHTML=list.map(a=>{
+      const st=a.status||"ativo";
+      const isServico=a.categoria==="servico";
+      const foto=Array.isArray(a.fotos)&&a.fotos[0]?a.fotos[0]:"";
+      const thumb=foto?`<img class="mod-photo" src="${foto}" alt="">`:`<div class="mod-noimg">sem foto</div>`;
+      const catLine=[isServico?"Serviço":"Produto",a.genero].filter(Boolean).join(" • ");
+      const stBadge=st==="pendente"?`<span class="badge topo">Em avaliação</span>`
+        :st==="reprovado"?`<span class="badge off" style="background:var(--danger-soft);color:var(--danger)">Reprovado</span>`
+        :st==="finalizado"?`<span class="badge off">Concluído</span>`
+        :`<span class="badge on">No ar</span>`;
+      const approveBtn=st!=="ativo"?`<button class="btn btn-approve" style="padding:9px 14px;font-size:13px" onclick="Panel.approveAd('${a.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width:15px;height:15px"><path d="M20 6 9 17l-5-5"/></svg> Aprovar
+        </button>`:"";
+      return `<div class="row">
+        <div style="display:flex;gap:12px;align-items:center;flex:none;cursor:pointer" onclick="Panel.openView('${a.id}')">${thumb}</div>
+        <div class="info" style="cursor:pointer" onclick="Panel.openView('${a.id}')">
+          <h3>${esc(a.titulo||"(sem título)")}</h3>
+          <div class="sub">${esc([a.autor,a.editora].filter(Boolean).join(" • ")||"—")}</div>
+          <div class="pos">
+            <span class="badge ${a.tipo==='troca'?'grade':a.tipo==='doacao'?'rodape':a.tipo==='orcamento'?'cabecalho':'off'}">${esc(tipoLabel[a.tipo]||a.tipo||"—")}</span>
+            ${catLine?`<span class="badge off">${esc(catLine)}</span>`:""}
+            ${a.nome?`<span class="badge off">por ${esc(a.nome)}</span>`:""}
+            ${stBadge}
+          </div>
+        </div>
+        <div class="acts">
+          <button class="iconbtn" title="Ver anúncio" onclick="Panel.openView('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          ${approveBtn}
+          ${st!=="reprovado"?`<button class="iconbtn" title="Reprovar anúncio" onclick="Panel.rejectAd('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/></svg></button>`:""}
+          <button class="iconbtn del" title="Excluir anúncio" onclick="Panel.deleteAd('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+        </div>
+      </div>`;
+    }).join("");
+  },
+  async approveAd(id){
+    const a=MOD_ADS.find(x=>x.id===id);if(!a)return;
+    try{
+      await updateDoc(doc(db,"marketplace",id),{status:"ativo",aprovadoEm:serverTimestamp(),motivoReprovacao:null,reprovadoEm:null});
+      a.status="ativo";
+      toast("Anúncio aprovado — já está no ar.","ok");
+      this.closeView();
+      this.renderModeracao();
+    }catch(err){
+      console.error(err);
+      toast(err.code==="permission-denied"?"Sem permissão. Atualize as regras do Firestore para 'marketplace' (admin pode aprovar).":"Não foi possível aprovar.","bad");
+    }
+  },
+  async rejectAd(id){
+    const a=MOD_ADS.find(x=>x.id===id);if(!a)return;
+    const motivo=prompt(`Reprovar o anúncio "${a.titulo||"(sem título)"}"\n\nDiga o motivo (o anunciante vê esta mensagem e pode corrigir e reenviar). Deixe em branco para reprovar sem motivo.`,"");
+    if(motivo===null)return; // cancelou
+    try{
+      await updateDoc(doc(db,"marketplace",id),{status:"reprovado",motivoReprovacao:motivo.trim()||null,reprovadoEm:serverTimestamp()});
+      a.status="reprovado";a.motivoReprovacao=motivo.trim()||null;
+      toast("Anúncio reprovado. O anunciante pode editar e reenviar.","ok");
+      this.closeView();
+      this.renderModeracao();
+    }catch(err){
+      console.error(err);
+      toast(err.code==="permission-denied"?"Sem permissão. Atualize as regras do Firestore para 'marketplace' (admin pode reprovar).":"Não foi possível reprovar.","bad");
+    }
+  },
+  async deleteAd(id){
+    const a=MOD_ADS.find(x=>x.id===id);if(!a)return;
+    if(!confirm(`Excluir definitivamente o anúncio "${a.titulo||"(sem título)"}"?\n\nUse isto para remover anúncios fora do nicho ou que violem as diretrizes do portal. Esta ação não pode ser desfeita.`))return;
+    try{
+      await deleteDoc(doc(db,"marketplace",id));
+      MOD_ADS=MOD_ADS.filter(x=>x.id!==id);
+      toast("Anúncio excluído.","ok");
+      this.closeView();
+      this.renderModeracao();
+    }catch(err){
+      console.error(err);
+      toast(err.code==="permission-denied"?"Sem permissão. Atualize as regras do Firestore para 'marketplace' (admin pode excluir).":"Não foi possível excluir.","bad");
+    }
+  },
+
+  /* ---------- abrir anúncio de terceiro (todas as fotos + informações) ---------- */
+  openView(id){
+    const a=MOD_ADS.find(x=>x.id===id);if(!a)return;
+    const st=a.status||"ativo";
+    const isServico=a.categoria==="servico";
+    const tipoLabel={venda:"Venda",troca:"Troca",doacao:"Doação",orcamento:"Orçamento"};
+    const catLabel=isServico?"Serviço":"Produto";
+    viewPhotos=Array.isArray(a.fotos)?a.fotos.filter(Boolean):[];
+    viewIdx=0;
+
+    const stBadge=st==="pendente"?`<span class="badge topo">Em avaliação</span>`
+      :st==="reprovado"?`<span class="badge off" style="background:var(--danger-soft);color:var(--danger)">Reprovado</span>`
+      :st==="finalizado"?`<span class="badge off">Concluído</span>`
+      :`<span class="badge on">No ar</span>`;
+    const tipoBadge=`<span class="badge ${a.tipo==='troca'?'grade':a.tipo==='doacao'?'rodape':a.tipo==='orcamento'?'cabecalho':'off'}">${esc(tipoLabel[a.tipo]||a.tipo||"—")}</span>`;
+
+    const waDigits=String(a.whatsapp||"").replace(/\D/g,"");
+    const waHref=waDigits?`https://wa.me/${waDigits.length<=11?'55'+waDigits:waDigits}`:"";
+    const dataPub=a.createdAt?.toMillis?new Date(a.createdAt.toMillis()).toLocaleString("pt-BR"):"";
+
+    const valorTxt=a.tipo==="venda"?("R$ "+Number(a.preco||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}))
+      :a.tipo==="troca"?("Troca por: "+(a.trocaPor||"—"))
+      :a.tipo==="orcamento"?"Sob orçamento"
+      :"Doação";
+
+    const rows=[
+      ["Tipo / valor",esc(valorTxt)],
+      ["Categoria",esc(catLabel)],
+      ["Categoria do anúncio",esc(a.genero||"—")],
+      isServico?["Como atende",esc(a.serie||"—")]:null,
+      !isServico?["Marca",esc(a.autor||"—")]:null,
+      !isServico?["Modelo",esc(a.editora||"—")]:null,
+      !isServico?["Estado de conservação",esc(a.estado||"—")]:null,
+    ].filter(Boolean);
+
+    const motivoBlock=st==="reprovado"&&a.motivoReprovacao
+      ? `<div class="vw-sec">Motivo da reprovação</div><div class="vw-desc" style="background:var(--danger-soft);color:var(--danger)">${esc(a.motivoReprovacao)}</div>`
+      : "";
+
+    const contato=[
+      ["Anunciante",esc(a.nome||"—")],
+      ["WhatsApp",waHref?`<a href="${waHref}" target="_blank" rel="noopener">${esc(a.whatsapp)}</a>`:esc(a.whatsapp||"—")],
+      ["Cidade",esc(a.cidade||"—")],
+      dataPub?["Cadastrado em",esc(dataPub)]:null,
+    ].filter(Boolean);
+
+    const mainImg=viewPhotos.length
+      ? `<img id="vwMainImg" src="${viewPhotos[0]}" alt="foto do anúncio">`
+      : `<span class="noimg">Este anúncio não tem fotos</span>`;
+    const thumbs=viewPhotos.length>1
+      ? `<div class="vw-thumbs">${viewPhotos.map((src,i)=>`<button class="vw-thumb ${i===0?'on':''}" data-i="${i}" onclick="Panel.viewPhoto(${i})"><img src="${src}" alt="foto ${i+1}"></button>`).join("")}</div>`
+      : "";
+
+    const approveBtn=st!=="ativo"
+      ? `<button class="btn btn-approve" onclick="Panel.approveAd('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> Aprovar anúncio</button>`
+      : "";
+    const rejectBtn=st!=="reprovado"
+      ? `<button class="btn btn-ghost" onclick="Panel.rejectAd('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/></svg> Reprovar</button>`
+      : "";
+
+    $("viewTitle").textContent=a.titulo||"Anúncio";
+    $("viewBody").innerHTML=`
+      <div class="vw-badges">${tipoBadge}${stBadge}</div>
+      <div class="vw-main">${mainImg}</div>
+      ${thumbs}
+      <div class="vw-sec">Informações do anúncio</div>
+      <div class="vw-info">${rows.map(([k,v])=>`<div class="vw-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}</div>
+      ${a.descricao?`<div class="vw-sec">Descrição</div><div class="vw-desc">${esc(a.descricao)}</div>`:""}
+      ${motivoBlock}
+      <div class="vw-sec">Contato do anunciante</div>
+      <div class="vw-info">${contato.map(([k,v])=>`<div class="vw-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}</div>
+      <div class="form-foot" style="margin-top:18px">
+        ${approveBtn}
+        ${rejectBtn}
+        <button class="btn btn-ghost" style="color:var(--danger);border-color:var(--danger-soft)" onclick="Panel.deleteAd('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg> Excluir</button>
+      </div>`;
+    $("viewScrim").classList.add("open");document.body.style.overflow="hidden";
+  },
+  viewPhoto(i){
+    if(i<0||i>=viewPhotos.length)return;
+    viewIdx=i;
+    const main=$("vwMainImg");if(main)main.src=viewPhotos[i];
+    document.querySelectorAll("#viewBody .vw-thumb").forEach(b=>b.classList.toggle("on",Number(b.dataset.i)===i));
+  },
+  closeView(){$("viewScrim").classList.remove("open");document.body.style.overflow="";},
+
+  /* ---------- visão geral: usuários e acessos ---------- */
+  async loadOverview(){
+    const box=$("overviewStats");
+    box.innerHTML=[["…","Usuários cadastrados"],["…","Acessos hoje"],["…","Acessos no mês"]]
+      .map(([n,l])=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+    try{
+      const today=dateStr();
+      const now=new Date();
+      const monthStart=dateStr(new Date(now.getFullYear(),now.getMonth(),1));
+      const monthEnd=dateStr(new Date(now.getFullYear(),now.getMonth()+1,0));
+      const [uTotal,aHoje,aMes]=await Promise.all([
+        getCountFromServer(query(usuariosRef,where("cadastrado","==",true))),
+        getCountFromServer(query(acessosRef,where("data","==",today))),
+        getCountFromServer(query(acessosRef,where("data",">=",monthStart),where("data","<=",monthEnd)))
+      ]);
+      box.innerHTML=[
+        [uTotal.data().count,"Usuários cadastrados"],
+        [aHoje.data().count,"Acessos hoje"],
+        [aMes.data().count,"Acessos no mês"],
+      ].map(([n,l])=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+    }catch(err){
+      console.error(err);
+      const code=err.code||err.message||"desconhecido";
+      box.innerHTML=`<div class="empty" style="border-color:var(--danger);background:var(--danger-soft)">
+        <h3 style="color:var(--danger)">Não consegui carregar os números</h3>
+        <p style="color:var(--danger)"><b>Código:</b> <code>${esc(code)}</code></p>
+        <p>Confira se as regras do Firestore liberam a leitura de <code>usuarios</code> e <code>acessos</code> para o seu e-mail de administrador.</p></div>`;
+    }
+    this.loadAccessChart();
+  },
+  async loadAccessChart(){
+    const wrap=$("accessBars");
+    wrap.innerHTML=`<p style="color:var(--ink-soft);font-size:13px">Carregando…</p>`;
+    try{
+      const days=[];for(let i=13;i>=0;i--)days.push(dateStr(addDays(new Date(),-i)));
+      const snap=await getDocs(query(acessosRef,where("data",">=",days[0])));
+      const counts={};days.forEach(d=>counts[d]=0);
+      snap.forEach(d=>{const v=d.data().data;if(v in counts)counts[v]++;});
+      const max=Math.max(1,...days.map(d=>counts[d]));
+      wrap.innerHTML=days.map(d=>{
+        const v=counts[d],h=Math.max(4,Math.round((v/max)*100));
+        const label=d.slice(8,10)+"/"+d.slice(5,7);
+        return `<div class="bar-col" title="${d}: ${v} acesso(s)">
+                   <div class="bar" style="height:${h}px"></div>
+                   <span class="bar-l">${label}</span>
+                 </div>`;
+      }).join("");
+    }catch(err){
+      console.error(err);
+      wrap.innerHTML=`<p style="color:var(--ink-soft);font-size:13px">Não foi possível carregar o gráfico de acessos.</p>`;
+    }
+  },
+
+  /* ---------- configurações: prazo e limite ---------- */
+  async loadConfigForm(){
+    clearMsg($("cfgMsg"));
+    try{
+      const snap=await getDoc(configRef);
+      const d=snap.exists()?snap.data():{};
+      $("cfgPrazo").value=d.prazoDias??0;
+      $("cfgLimite").value=d.limiteAnuncios??0;
+    }catch(err){console.error(err);}
+  },
+  async saveConfig(e){
+    e.preventDefault();
+    const prazoDias=Math.max(0,parseInt($("cfgPrazo").value||"0",10));
+    const limiteAnuncios=Math.max(0,parseInt($("cfgLimite").value||"0",10));
+    $("cfgSaveBtn").disabled=true;
+    try{
+      await setDoc(configRef,{prazoDias,limiteAnuncios,updatedAt:serverTimestamp()},{merge:true});
+      msg($("cfgMsg"),"Configurações salvas. Já valem para todos os anúncios.","ok");
+      toast("Configurações atualizadas.","ok");
+    }catch(err){
+      console.error(err);
+      msg($("cfgMsg"),err.code==="permission-denied"?"Sem permissão. Confira se seu e-mail está nas regras do Firestore para 'config'.":"Erro ao salvar: "+(err.code||err.message),"err");
+    }finally{$("cfgSaveBtn").disabled=false;}
+  },
+
+  /* ---- form ---- */
+  openForm(ad=null){
+    editing=ad?ad.id:null;pendingImg=ad?ad.imagem||null:null;
+    $("formTitle").textContent=ad?"Editar banner":"Novo banner";
+    $("saveBtn").textContent=ad?"Salvar alterações":"Publicar banner";
+    $("editId").value=ad?ad.id:"";
+    $("titulo").value=ad?.titulo||"";$("descricao").value=ad?.descricao||"";$("link").value=ad?.link||"";
+    $("mensagem").value=ad?.mensagem||"";
+    $("ordem").value=ad?.ordem??0;$("ativo").checked=ad?ad.ativo!==false:true;
+    // prazo individual do banner
+    $("validoAte").value=ad?.validoAte||"";
+    $("tempoBanner").value=ad?.tempoBanner??6;
+    // tipo de mídia (imagem / vídeo) + link do vídeo
+    (document.querySelector(`#midiaSeg input[value="${ad?.tipoMidia||'imagem'}"]`)||{}).checked=true;
+    $("videoUrl").value=ad?.videoUrl||"";
+    // escurecimento da imagem (scrim): novos banners começam em 35; existentes respeitam o valor salvo
+    const scrim=ad?(ad.overlayScrim!=null?ad.overlayScrim:0):35;
+    $("overlayScrim").value=scrim;
+    $("scrimVal").textContent=scrim+"%";
+    // overlay de texto
+    $("overlayTitulo").value=ad?.overlayTitulo||"";
+    $("overlaySub").value=ad?.overlaySub||"";
+    $("overlayFont").value=ad?.overlayFont||"DM Sans";
+    $("overlaySize").value=ad?.overlaySize||28;
+    $("overlayColor").value=ad?.overlayColor||"#ffffff";
+    $("overlaySubColor").value=ad?.overlaySubColor||"#f0f0f0";
+    $("overlayColorHex").textContent=ad?.overlayColor||"#ffffff";
+    $("overlaySubColorHex").textContent=ad?.overlaySubColor||"#f0f0f0";
+    $("togBold").classList.toggle("on",!!ad?.overlayBold);
+    $("togItalic").classList.toggle("on",!!ad?.overlayItalic);
+    $("togShadow").classList.toggle("on",ad?.overlayShadow!==false);
+    Panel.setOverlayPos(ad?.overlayPos||"mid-center");
+    (document.querySelector(`#posSeg input[value="${ad?.posicao||'topo'}"]`)||{}).checked=true;
+    clearMsg($("formMsg"));this.syncMidia();this.syncPreview();
+    $("formScrim").classList.add("open");document.body.style.overflow="hidden";
+  },
+  closeForm(){$("formScrim").classList.remove("open");document.body.style.overflow="";},
+  syncMidia(){
+    const v=document.querySelector('#midiaSeg input:checked')?.value||'imagem';
+    $("videoField").classList.toggle("hide",v!=='video');
+    this.syncPreview();
+  },
+  async pickImage(e){
+    const f=e.target.files[0];e.target.value="";if(!f)return;
+    try{pendingImg=await compress(f);this.syncPreview();}catch{toast("Não consegui processar a imagem.","bad");}
+  },
+  syncPreview(){
+    const pos=document.querySelector('#posSeg input:checked').value;
+    const p=$("preview");p.className="prev "+pos;
+    const midia=document.querySelector('#midiaSeg input:checked')?.value||'imagem';
+    const lbl=$("dropLbl");if(lbl)lbl.textContent=pendingImg?"Imagem carregada — toque para trocar":"Toque para enviar a imagem";
+    // atualiza hex labels
+    const oc=$("overlayColor"),osc=$("overlaySubColor");
+    if(oc){$("overlayColorHex").textContent=oc.value;}
+    if(osc){$("overlaySubColorHex").textContent=osc.value;}
+    // escurecimento
+    const scrim=Math.min(85,Math.max(0,parseInt($("overlayScrim")?.value||"0",10)));
+    if($("scrimVal"))$("scrimVal").textContent=scrim+"%";
+    const vid=midia==='video'?ytId($("videoUrl")?.value||""):"";
+    const bg=pendingImg||(vid?`https://img.youtube.com/vi/${vid}/hqdefault.jpg`:"");
+    if(bg){
+      const otxt=$("overlayTitulo")?.value||"";
+      const osub=$("overlaySub")?.value||"";
+      const font=$("overlayFont")?.value||"DM Sans";
+      const size=parseInt($("overlaySize")?.value||"28",10);
+      const color=oc?.value||"#ffffff";
+      const subColor=osc?.value||"#f0f0f0";
+      const bold=$("togBold")?.classList.contains("on");
+      const italic=$("togItalic")?.classList.contains("on");
+      const shadow=$("togShadow")?.classList.contains("on");
+      const overlayPos=document.querySelector("#posGrid .pos-cell.on")?.dataset.pos||"mid-center";
+      const posStyle=Panel.overlayPosStyle(overlayPos);
+      const shadowStyle=shadow?"text-shadow:1px 2px 8px rgba(0,0,0,.7),0 0 20px rgba(0,0,0,.4)":"";
+      const overlayHTML=(otxt||osub)?`<div class="overlay-txt" style="z-index:2;${posStyle}font-family:'${font}',sans-serif;${shadowStyle}">
+        ${otxt?`<div style="font-size:${size}px;color:${color};font-weight:${bold?700:400};font-style:${italic?'italic':'normal'};line-height:1.2">${esc(otxt)}</div>`:""}
+        ${osub?`<div style="font-size:${Math.round(size*0.6)}px;color:${subColor};font-weight:${bold?600:400};font-style:${italic?'italic':'normal'};margin-top:4px">${esc(osub)}</div>`:""}
+      </div>`:"";
+      const scrimHTML=scrim>0?`<div style="position:absolute;inset:0;background:rgba(0,0,0,${scrim/100});z-index:1"></div>`:"";
+      const playHTML=vid?`<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;width:54px;height:54px;border-radius:50%;background:rgba(20,40,37,.62);display:grid;place-items:center;color:#fff"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="margin-left:3px"><path d="M8 5v14l11-7z"/></svg></div>`:"";
+      p.innerHTML=`<img src="${bg}" alt="prévia">${scrimHTML}${overlayHTML}${playHTML}`;
+    }else{
+      const extra=vid?"":(midia==='video'?" — cole o link do YouTube":"");
+      p.innerHTML=`<div class="ph">${$("titulo").value?esc($("titulo").value):"A pré-visualização aparece aqui"}${$("descricao").value?" — "+esc($("descricao").value):""}${extra}</div>`;
+    }
+  },
+  overlayPosStyle(pos){
+    const map={
+      "top-left":   "top:12px;left:12px;text-align:left;",
+      "top-center": "top:12px;left:50%;transform:translateX(-50%);text-align:center;",
+      "top-right":  "top:12px;right:12px;text-align:right;",
+      "mid-left":   "top:50%;left:12px;transform:translateY(-50%);text-align:left;",
+      "mid-center": "top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;",
+      "mid-right":  "top:50%;right:12px;transform:translateY(-50%);text-align:right;",
+      "bot-left":   "bottom:12px;left:12px;text-align:left;",
+      "bot-center": "bottom:12px;left:50%;transform:translateX(-50%);text-align:center;",
+      "bot-right":  "bottom:12px;right:12px;text-align:right;",
+    };
+    return map[pos]||map["mid-center"];
+  },
+  toggleTog(id){$(id).classList.toggle("on");},
+  setOverlayPos(pos){
+    document.querySelectorAll("#posGrid .pos-cell").forEach(el=>{
+      el.classList.toggle("on",el.dataset.pos===pos);
+    });
+    this.syncPreview();
+  },
+  async save(e){
+    e.preventDefault();
+    const data={
+      titulo:$("titulo").value.trim(),descricao:$("descricao").value.trim(),link:this.normalizeLink($("link").value),
+      mensagem:$("mensagem").value.trim(),
+      posicao:document.querySelector('#posSeg input:checked').value,
+      ordem:parseInt($("ordem").value||"0",10),ativo:$("ativo").checked,
+      imagem:pendingImg||"",updatedAt:serverTimestamp(),
+      validoAte:$("validoAte").value||null,
+      tempoBanner:Math.max(3,parseInt($("tempoBanner").value||"6",10)),
+      // overlay de texto sobre a imagem
+      overlayTitulo:$("overlayTitulo").value.trim(),
+      overlaySub:$("overlaySub").value.trim(),
+      overlayFont:$("overlayFont").value||"DM Sans",
+      overlaySize:Math.min(72,Math.max(12,parseInt($("overlaySize").value||"28",10))),
+      overlayColor:$("overlayColor").value||"#ffffff",
+      overlaySubColor:$("overlaySubColor").value||"#f0f0f0",
+      overlayBold:$("togBold").classList.contains("on"),
+      overlayItalic:$("togItalic").classList.contains("on"),
+      overlayShadow:$("togShadow").classList.contains("on"),
+      overlayPos:document.querySelector("#posGrid .pos-cell.on")?.dataset.pos||"mid-center",
+      // escurecimento da imagem (legibilidade do texto)
+      overlayScrim:Math.min(85,Math.max(0,parseInt($("overlayScrim").value||"0",10))),
+      // tipo de mídia + vídeo do YouTube
+      tipoMidia:document.querySelector('#midiaSeg input:checked')?.value||"imagem",
+      videoUrl:$("videoUrl").value.trim(),
+    };
+    if(!data.titulo)return msg($("formMsg"),"Informe um título.","err");
+    if(data.tipoMidia==="video"&&!ytId(data.videoUrl))
+      return msg($("formMsg"),"Cole um link válido do YouTube (ex.: https://youtu.be/ID ou https://www.youtube.com/watch?v=ID).","err");
+    if(JSON.stringify(data).length>980000)return msg($("formMsg"),"A imagem ficou grande demais. Use uma menor.","err");
+    $("saveBtn").disabled=true;
+    try{
+      if(editing)await updateDoc(doc(db,"banners",editing),data);
+      else await addDoc(ref,{...data,createdAt:serverTimestamp()});
+      toast(editing?"Banner atualizado.":"Banner publicado.","ok");this.closeForm();
+    }catch(err){
+      console.error(err);
+      msg($("formMsg"),err.code==="permission-denied"?"Sem permissão. Confira se seu e-mail está nas regras do Firestore para 'banners'.":"Erro ao salvar: "+(err.code||err.message),"err");
+    }finally{$("saveBtn").disabled=false;}
+  },
+  async toggleActive(id,val){
+    try{await updateDoc(doc(db,"banners",id),{ativo:val,updatedAt:serverTimestamp()});}
+    catch(err){toast("Não foi possível alterar o status.","bad");this.render();}
+  },
+  async remove(id){
+    const a=ADS.find(x=>x.id===id);if(!a)return;
+    if(!confirm(`Excluir o banner "${a.titulo}"?`))return;
+    try{await deleteDoc(doc(db,"banners",id));toast("Banner excluído.","ok");}
+    catch(err){toast("Não foi possível excluir.","bad");}
+  },
+
+  /* ---- render ---- */
+  render(){
+    const posName={cabecalho:"Abaixo do cabeçalho",topo:"Topo da lista",rodape:"Rodapé"};
+    $("stats").innerHTML=[
+      ["Total",ADS.length],["No ar",ADS.filter(a=>a.ativo!==false).length],
+      ["Cabeçalho",ADS.filter(a=>a.posicao==="cabecalho").length],
+      ["Topo",ADS.filter(a=>a.posicao==="topo").length],
+      ["Rodapé",ADS.filter(a=>a.posicao==="rodape").length],
+    ].map(([l,n])=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+
+    if(!ADS.length){$("list").innerHTML="";$("emptyState").classList.remove("hide");return;}
+    $("emptyState").classList.add("hide");
+    $("list").innerHTML=ADS.map(a=>{
+      const vid=a.tipoMidia==="video"?ytId(a.videoUrl):"";
+      const thumb=a.imagem?`<img src="${a.imagem}" alt="">`:(vid?`<img src="https://img.youtube.com/vi/${vid}/hqdefault.jpg" alt="">`:`<span>sem imagem</span>`);
+      const on=a.ativo!==false;
+      // prazo: verifica se expirou
+      let prazoBadge="";
+      if(a.validoAte){
+        const expired=new Date(a.validoAte)<new Date(new Date().toDateString());
+        const label=new Date(a.validoAte).toLocaleDateString("pt-BR");
+        prazoBadge=`<span class="badge ${expired?'off':'grade'}">${expired?"Expirado em":"Até"} ${label}</span>`;
+      }
+      return `<div class="row">
+        <div class="thumb">${thumb}</div>
+        <div class="info">
+          <h3>${esc(a.titulo)}</h3>
+          <div class="sub">${a.link?esc(a.link):"sem link"}${a.descricao?" • "+esc(a.descricao):""}</div>
+          <div class="pos">
+            <span class="badge ${a.posicao}">${posName[a.posicao]||a.posicao}</span>
+            ${vid?`<span class="badge grade">▶ Vídeo</span>`:""}
+            <span class="badge ${on?'on':'off'}">${on?"No ar":"Pausado"}</span>
+            <span class="badge off">ordem ${a.ordem??0}</span>
+            ${prazoBadge}
+            ${a.tempoBanner&&a.tempoBanner!==6?`<span class="badge off">${a.tempoBanner}s no slide</span>`:""}
+          </div>
+        </div>
+        <div class="acts">
+          <label class="switch" title="Ativar/pausar"><input type="checkbox" ${on?"checked":""} onchange="Panel.toggleActive('${a.id}',this.checked)"><span class="slider"></span></label>
+          <button class="iconbtn" title="Editar" onclick="Panel.editById('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+          <button class="iconbtn del" title="Excluir" onclick="Panel.remove('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+        </div>
+      </div>`;
+    }).join("");
+  },
+  editById(id){const a=ADS.find(x=>x.id===id);if(a)this.openForm(a);},
+};
+window.Panel=Panel;
+$("ativo").addEventListener("change",e=>$("ativoLbl").textContent=e.target.checked?"Ativo (no ar)":"Pausado");
+["titulo","descricao"].forEach(id=>$(id).addEventListener("input",()=>Panel.syncPreview()));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){Panel.closeForm();Panel.closeView();}});
+$("formScrim").addEventListener("click",e=>{if(e.target===$("formScrim"))Panel.closeForm();});
+$("viewScrim").addEventListener("click",e=>{if(e.target===$("viewScrim"))Panel.closeView();});
+$("email").addEventListener("keydown",e=>{if(e.key==="Enter")$("senha").focus();});
+$("senha").addEventListener("keydown",e=>{if(e.key==="Enter")Panel.auth();});
+
+/* ---- boot ---- */
+function showLogin(){$("loginCard").classList.remove("hide");$("dash").classList.add("hide");$("whoami").classList.add("hide");$("logoutBtn").classList.add("hide");}
+function showDash(email){
+  $("loginCard").classList.add("hide");$("dash").classList.remove("hide");
+  $("whoami").textContent=email;$("whoami").classList.remove("hide");$("logoutBtn").classList.remove("hide");
+  Panel.switchTab("overview");
+}
+
+if(!isConfigured){$("setupCard").classList.remove("hide");}
+else{
+  // App NOMEADO: isola a sessão do painel da sessão (anônima) do portal,
+  // que vive no app padrão e estava trocando esta tela de login pelo dashboard.
+  const app=initializeApp(firebaseConfig,"marketplace-painel");
+  auth=getAuth(app);db=getFirestore(app);ref=collection(db,"banners");
+  usuariosRef=collection(db,"usuarios");acessosRef=collection(db,"acessos");configRef=doc(db,"config","geral");
+  anunciosRef=collection(db,"marketplace");
+  let bannersSubReady=false;
+  onAuthStateChanged(auth,user=>{
+    // só consideramos administrador uma conta real (não anônima)
+    if(user&&!user.isAnonymous){
+      showDash(user.email);
+      if(bannersSubReady)return;bannersSubReady=true;
+      onSnapshot(query(ref,orderBy("ordem","asc")),snap=>{
+        ADS=snap.docs.map(d=>({id:d.id,...d.data()}));
+        ADS.sort((a,b)=>(a.ordem??0)-(b.ordem??0));
+        Panel.render();
+      },err=>{
+        console.error(err);
+        const code=err.code||err.message||"desconhecido";
+        const dica=code.includes("permission-denied")
+          ? "As regras do Firestore não estão liberando a leitura de 'banners'. Publique o bloco de regras completo (marketplace + banners)."
+          : code.includes("failed-precondition")
+          ? "Falta um índice no Firestore. Abra o link que aparece no Console (F12) para criá-lo."
+          : "Erro de conexão com o Firestore. Recarregue a página.";
+        $("list").innerHTML=`<div class="empty" style="border-color:var(--danger);background:var(--danger-soft)">
+          <h3 style="color:var(--danger)">Não consegui ler os banners</h3>
+          <p style="color:var(--danger)"><b>Código:</b> <code>${esc(code)}</code></p>
+          <p>${esc(dica)}</p></div>`;
+        $("emptyState").classList.add("hide");
+        toast("Erro ao ler banners: "+code,"bad");
+      });
+    }else{showLogin();}
+  });
+}
+</script>
+</body>
+</html>
