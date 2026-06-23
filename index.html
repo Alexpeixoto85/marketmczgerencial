@@ -604,6 +604,7 @@ const ADMIN_EMAIL = "";
 const isConfigured = !String(firebaseConfig.apiKey).startsWith("COLE_AQUI");
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp,
@@ -1295,6 +1296,7 @@ else{
   // App NOMEADO: isola a sessão do painel da sessão (anônima) do portal,
   // que vive no app padrão e estava trocando esta tela de login pelo dashboard.
   const app=initializeApp(firebaseConfig,"marketplace-painel");
+  try{getAnalytics(app);}catch(e){console.warn("analytics:",e);}
   auth=getAuth(app);db=getFirestore(app);ref=collection(db,"banners");
   usuariosRef=collection(db,"usuarios");acessosRef=collection(db,"acessos");configRef=doc(db,"config","geral");
   anunciosRef=collection(db,"marketplace");
